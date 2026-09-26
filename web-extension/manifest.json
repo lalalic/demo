@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Demo Runtime",
+  "version": "0.1.0",
+  "description": "Shared visual demo primitives for product demos.",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["demo-runtime.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
