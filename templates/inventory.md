@@ -12,7 +12,7 @@
 
 ## Targets
 
-Only declare stable targets a storyboard may reference.
+Only declare stable targets a demo execution item may reference at runtime.
 
 | Name | Selector / ref / label | Purpose |
 |---|---|---|

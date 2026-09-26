@@ -2,7 +2,9 @@
 
 Shared demo execution skill and platform runtimes.
 
-`video.md` remains the canonical Markcut source upstream. Execution Director extracts unresolved media requirements into typed JSON lanes. This repository owns only the **demo** lane runtime:
+`video.md` remains the canonical Markcut source upstream.
+Markcut may carry out-of-band `<!-- execution {...} -->` comments. Markcut ignores those comments; Execution Director extracts them into `execution/*.json`. This demo repository never parses Markcut and only consumes `execution/demo.json`.
+ Execution Director extracts unresolved media requirements into typed JSON lanes. This repository owns only the **demo** lane runtime:
 
 ```text
 video.md

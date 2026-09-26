@@ -7,6 +7,9 @@ description: Execute semantic demo work from execution/demo.json against a produ
 
 This repository is the shared runtime skill for the **demo execution lane**. It does not define a second video plan, storyboard, or timeline.
 
+
+Markcut may carry out-of-band `<!-- execution {...} -->` comments. Markcut ignores those comments; Execution Director extracts them into `execution/*.json`. This demo repository never parses Markcut and only consumes `execution/demo.json`.
+
 Canonical upstream flow:
 
 ```text
