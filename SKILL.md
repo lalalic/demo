@@ -1,68 +1,59 @@
 ---
 name: demo
-description: Create reproducible product demos from a product-owned .demo package. Uses a shared demo primitive runtime for web/Chrome and iOS, reads .demo/inventory.md plus optional fixtures/scenarios/scripts, composes a storyboard, drives the real product UI, records the result, and emits reusable clips.
+description: Execute semantic demo work from execution/demo.json against a product-owned .demo package using shared Web/iOS demo primitives, real UI drivers, recording, and fresh-UI verification.
 ---
 
 # Demo
 
-Use this skill to plan and execute product demos without teaching the shared engine product-specific behavior.
+This repository is the shared runtime skill for the **demo execution lane**. It does not define a second video plan, storyboard, or timeline.
+
+Canonical upstream flow:
+
+```text
+video.md (Markcut, owned by Video Director)
+  -> Execution Director
+  -> execution/demo.json
+  -> Demo Agent
+  -> this demo skill + <product>/.demo/
+  -> real product UI
+  -> requested media asset
+```
+
+## Input contract
+
+Consume one item from `execution/demo.json`. The machine schema is `schemas/demo-execution-v1.schema.json` and an example is in `examples/execution/demo.json`.
+
+A demo item carries semantic requirements only: stable id, source scene, product/surface/feature identity, intent, visible evidence, fresh-UI success criteria, presentation intent, autonomy boundary, and expected output path. It must not contain brittle selectors, coordinates, or fixed click sequences.
 
 ## Product contract
 
-A product that supports demos owns a `.demo/` directory at its repository root:
+A product that supports demos owns a `.demo/` directory:
 
 ```text
 .demo/
-├── inventory.md          # required: what can be demonstrated
-├── fixtures/             # optional: deterministic demo data
-├── scenarios/            # optional: reproducible scenario definitions
-├── scripts/              # optional: replay / state-setup scripts
-└── adapters/             # optional: product-specific state injection helpers
+├── inventory.md          # required
+├── fixtures/             # optional
+├── scenarios/            # optional
+├── scripts/              # optional
+└── adapters/             # optional
 ```
 
-Only `.demo/inventory.md` is required. Keep demo-only data and replay logic inside `.demo/` rather than scattering it through product source. A product may expose a minimal generic bridge when external state injection is impossible, but the demo assets remain in `.demo/`.
+The Demo Agent uses `.demo/inventory.md` to resolve product-specific targets/scenarios and loads only the assets needed for the current execution item.
 
-Start from `templates/inventory.md`.
+## Shared primitives
 
-## Shared primitive contract
-
-The visual primitive vocabulary is platform-neutral and defined in `contracts/primitives.md`:
+The platform-neutral visual vocabulary is defined in `contracts/primitives.md`:
 
 `step`, `spotlight`, `annotate`, `caption`, `say`, `cursor`, `highlight`, `clear`, `pause`, `resume`, `wait`, `start_recording`, `stop_recording`.
 
-The demo agent should use this vocabulary rather than inventing platform-specific overlay commands.
+UI-driving verbs such as click/type/tap/swipe/navigation are not demo primitives; use the real UI driver (for example browser-harness or app control).
 
 ## Platform runtimes
 
-### Web / Chrome extension
+- `web-extension/`: Chrome MV3 runtime exposing the shared browser primitives as `window.demo`.
+- `ios/`: reusable Swift `DemoKit` package implementing the same semantic primitives.
+- `runtimes/`: browser runtime source/build output shared with the extension and legacy runner.
 
-`web-extension/` installs the shared browser runtime into every normal web page as `window.demo`. It only provides demo visuals/timeline. Browser navigation and real UI actions remain the responsibility of browser-harness/agent-browser.
+## Legacy compatibility
 
-For development, load `web-extension/` as an unpacked Chrome extension. The existing runner also falls back to direct runtime injection when the extension is not installed.
-
-### iOS
-
-`ios/` is a Swift Package (`DemoKit`). An app includes it, owns the element-resolution bridge, places `DemoOverlayView` over its root view, and exposes the same primitive commands through its MCP/app control layer.
-
-## Workflow
-
-1. Locate `<product>/.demo/inventory.md`.
-2. Read only the capabilities needed for the requested demo: surface, targets/selectors, scenarios, and recipes.
-3. If deterministic state is needed, use `.demo/fixtures`, `.demo/scenarios`, and `.demo/scripts` to prepare it while keeping the real product rendering path.
-4. Compose a short `storyboard.md` from `templates/storyboard.md`.
-5. Execute real UI actions through the platform driver and visual primitives through the shared demo runtime.
-6. Record the full run and emit `events.json`, `demo.mp4`, and per-step clips.
-
-Do not invent selectors/scenarios that are absent from the product inventory. If the product lacks a needed capability, update its `.demo/` package first.
-
-## Runner
-
-The migrated v1 runner remains under `scripts/` and `runtimes/`:
-
-```bash
-./scripts/run.sh --target=web --storyboard=/path/storyboard.md --out=/path/out --url=https://example.com
-./scripts/run.sh --target=extension --storyboard=/path/storyboard.md --out=/path/out
-./scripts/run.sh --target=ios --storyboard=/path/storyboard.md --out=/path/out --device-mcp-url=http://...
-```
-
-The runner is intentionally kept compatible with the original `demo-video` implementation while this repository becomes the canonical shared home.
+The original storyboard runner remains for migration compatibility only. See `legacy/README.md`. New callers should not author `storyboard.md`, `demo-plan`, or `demo-script` artifacts.

@@ -1,51 +1,45 @@
 # demo
 
-Shared demo skill and runtime for reproducible product demos.
+Shared demo execution skill and platform runtimes.
 
-The repository root is itself an installable skill. It combines three things only:
-
-1. **Demo skill** — reads a product's `.demo/` package, authors/executes storyboards, records and clips demos.
-2. **Shared visual runtime** — Chrome extension for web and `DemoKit` Swift package for iOS, both implementing the same primitive vocabulary.
-3. **Product contract** — each product owns `.demo/inventory.md` and optional fixtures/scenarios/scripts.
+`video.md` remains the canonical Markcut source upstream. Execution Director extracts unresolved media requirements into typed JSON lanes. This repository owns only the **demo** lane runtime:
 
 ```text
-Demo Agent
-    ↓
-this demo skill
-    ├── product/.demo/
-    ├── shared visual runtime
-    └── real UI driver (browser-harness / app control)
-             ↓
-          real product
-             ↓
-      demo.mp4 + clips
+video.md
+  -> Execution Director
+  -> execution/demo.json
+  -> Demo Agent
+  -> demo skill
+       + product/.demo/
+       + real UI driver
+       + shared visual runtime
+  -> assets/<requested-output>.mp4
 ```
 
-## Product layout
+## Public contracts
+
+- `schemas/demo-execution-v1.schema.json` — input lane contract.
+- `templates/inventory.md` — product `.demo/inventory.md` template.
+- `contracts/primitives.md` — cross-platform visual primitive vocabulary.
+
+## Product-owned demo package
 
 ```text
-my-product/
+product/
 └── .demo/
     ├── inventory.md
     ├── fixtures/
     ├── scenarios/
-    └── scripts/
+    ├── scripts/
+    └── adapters/
 ```
 
-`inventory.md` is an inventory/capability declaration, not executable runtime code. Demo-only data and replay assets live beside it under `.demo/`.
+Only `inventory.md` is required. Demo-only data and replay logic stay inside `.demo/`; the shared skill stays product-agnostic.
 
-## Repository layout
+## Runtime implementations
 
-```text
-SKILL.md
-contracts/primitives.md
-runtimes/                 # migrated web runtime
-scripts/                  # migrated storyboard runner/recording pipeline
-templates/
-web-extension/            # Chrome MV3 wrapper for the web runtime
-ios/                      # DemoKit Swift Package
-examples/product-demo/    # minimal .demo example
-legacy-design.md           # preserved original demo-video design
-```
+- `web-extension/` injects the browser runtime into normal pages as `window.demo`.
+- `ios/` contains the reusable `DemoKit` Swift package.
+- `runtimes/` contains the browser runtime source and build output.
 
-The initial code is intentionally a migration of the previously working `copilot-infinite/demo-video` and NeoX demo primitives, not a redesign.
+The original storyboard/recording shell pipeline is retained under a compatibility boundary and is not the public planning contract. See `legacy/README.md`.

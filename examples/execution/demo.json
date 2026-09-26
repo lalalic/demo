@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "profiles-demo",
+      "type": "demo",
+      "scene_id": "profiles",
+      "output": "assets/profiles-demo.mp4",
+      "identity": {"product": "Family Tutor", "surface": "extension popup", "feature": "kids list"},
+      "intent": {"purpose": "Reveal separate learning spaces", "communicates": "Each child has a distinct profile"},
+      "required_visible_evidence": ["Two named child profiles are visible"],
+      "success": {"fresh_ui_required": true, "visible_state": "Two named child profiles are visible"},
+      "presentation": {"focus": "kids list", "highlight": ["profile rows"], "text": ["One profile per child"], "zoom": "emphasis", "duration_seconds": 6},
+      "autonomy": {"allowed_recovery": ["reopen product surface"], "boundary": "Stop if fresh UI cannot verify the state."}
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://demo.local/schemas/demo-execution-v1.schema.json",
+  "title": "Demo Execution Lane v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "items"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "scene_id", "output", "identity", "intent", "required_visible_evidence", "success", "presentation", "autonomy"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "type": {"const": "demo"},
+          "scene_id": {"type": "string", "minLength": 1},
+          "output": {"type": "string", "minLength": 1},
+          "identity": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["product", "surface", "feature"],
+            "properties": {
+              "product": {"type": "string", "minLength": 1},
+              "surface": {"type": "string", "minLength": 1},
+              "feature": {"type": "string", "minLength": 1}
+            }
+          },
+          "intent": {
+            "type": "object",
+            "required": ["purpose", "communicates"],
+            "properties": {
+              "purpose": {"type": "string", "minLength": 1},
+              "communicates": {"type": "string", "minLength": 1}
+            }
+          },
+          "required_visible_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "success": {
+            "type": "object",
+            "required": ["fresh_ui_required", "visible_state"],
+            "properties": {
+              "fresh_ui_required": {"const": true},
+              "visible_state": {"type": "string", "minLength": 1}
+            }
+          },
+          "presentation": {
+            "type": "object",
+            "required": ["focus", "highlight", "text", "zoom", "duration_seconds"],
+            "properties": {
+              "focus": {"type": "string", "minLength": 1},
+              "highlight": {"type": "array", "items": {"type": "string"}},
+              "text": {"type": "array", "items": {"type": "string"}},
+              "zoom": {"enum": ["none", "subtle", "emphasis"]},
+              "duration_seconds": {"type": "number", "exclusiveMinimum": 0}
+            }
+          },
+          "autonomy": {
+            "type": "object",
+            "required": ["allowed_recovery", "boundary"],
+            "properties": {
+              "allowed_recovery": {"type": "array", "items": {"type": "string"}},
+              "boundary": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}
